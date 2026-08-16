@@ -642,7 +642,7 @@ const ReceiptScanner = ({
           </div>
 
           {isScanning && (
-            <div className="ocr-scan-progress-wrap" onClick={(e) => e.stopPropagation()}>
+            <div className="ocr-scan-progress-wrap" onClick={(e) => e.stopPropagation()} role="status" aria-live="polite">
               <div className="ocr-scan-header">
                 <div className="ocr-scan-status">
                   <ScanLine size={18} className="ocr-spin-icon" />
@@ -650,7 +650,14 @@ const ReceiptScanner = ({
                 </div>
                 <span className="ocr-progress-percent">{progress}%</span>
               </div>
-              <div className="ocr-progress-bar-track">
+              <div
+                className="ocr-progress-bar-track"
+                role="progressbar"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Receipt scanning progress"
+              >
                 <div className="ocr-progress-bar-fill" style={{ width: `${Math.max(progress, 6)}%` }} />
               </div>
             </div>
@@ -740,7 +747,14 @@ const ReceiptScanner = ({
                 </div>
                 <span className="ocr-progress-percent">{progress}%</span>
               </div>
-              <div className="ocr-progress-bar-track">
+              <div
+                className="ocr-progress-bar-track"
+                role="progressbar"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Receipt scanning progress"
+              >
                 <div className="ocr-progress-bar-fill" style={{ width: `${Math.max(progress, 6)}%` }} />
               </div>
             </div>
