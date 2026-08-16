@@ -500,7 +500,9 @@ input:focus, select:focus {
 }
 
 .support form button {
-  background: var(--purple);
+  /* Explicit dark violet + white text keeps AA contrast in both themes. */
+  background: #5b21b6;
+  color: #fff;
 }
 
 .link {
@@ -545,9 +547,28 @@ footer b {
   max-width: 90vw;
 }
 
-button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
-  outline: 2px solid var(--blue);
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible, [tabindex]:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--blue);
   outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Keyboard-only shortcut past the header straight into page content. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2000;
+  padding: 10px 16px;
+  background: var(--blue);
+  color: #001320;
+  font-weight: 700;
+  border-radius: 0 0 10px 0;
+}
+
+.skip-link:focus {
+  left: 0;
 }
 
 .agent-details-card {
@@ -1550,7 +1571,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   box-shadow: 0 4px 12px rgba(182, 255, 53, 0.3);
 }
 
-.pwa-banner-text h3 {
+.pwa-banner-text .pwa-banner-title {
   margin: 0 0 2px 0;
   font-size: 15px;
   font-weight: 700;

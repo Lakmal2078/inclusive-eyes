@@ -196,10 +196,13 @@ export const PromoBanner = ({ notify, t }) => {
   );
 };
 
-export const PrivacyPolicyPage = ({ t }) => (
+export const PrivacyPolicyPage = ({ t, embedded = false }) => {
+  const Title = embedded ? 'h2' : 'h1';
+  const SectionTitle = embedded ? 'h3' : 'h2';
+  return (
   <section className="panel" style={{ maxWidth: '850px', margin: '30px auto' }}>
     <span className="eyebrow">{t?.privacyPage?.eyebrow || 'Privacy Policy'}</span>
-    <h1 style={{ fontSize: '32px', margin: '16px 0 8px' }}>{t?.privacyPage?.title || 'Privacy Policy - Fast_X Official Sri Lanka'}</h1>
+    <Title style={{ fontSize: '32px', margin: '16px 0 8px' }}>{t?.privacyPage?.title || 'Privacy Policy - Fast_X Official Sri Lanka'}</Title>
     <p style={{ color: 'var(--muted)', fontSize: '15px', marginBottom: '28px' }}>{t?.privacyPage?.subtitle}</p>
     <div style={{ display: 'grid', gap: '20px' }}>
       <article style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '14px', border: '1px solid var(--line)' }}>
@@ -228,7 +231,7 @@ export const PrivacyPolicyPage = ({ t }) => (
         </ul>
       </article>
       <article style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '14px', border: '1px solid var(--line)' }}>
-        <h3 style={{ color: '#ffc857', margin: '0 0 10px', fontSize: '17px' }}>{t?.privacyPage?.section4Title}</h3>
+        <SectionTitle style={{ color: '#ffc857', margin: '0 0 10px', fontSize: '17px' }}>{t?.privacyPage?.section4Title}</SectionTitle>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '8px', fontSize: '14px', color: 'var(--muted)' }}>
           <li>{t?.privacyPage?.s4Item1}</li>
           <li>{t?.privacyPage?.s4Item2}</li>
@@ -237,7 +240,8 @@ export const PrivacyPolicyPage = ({ t }) => (
       </article>
     </div>
   </section>
-);
+  );
+};
 
 // --- Header & Layout ---
 export const Header = ({ page, move, user, logout, drawer, setDrawer, theme, toggleTheme, lang, setLang, t }) => {
@@ -561,14 +565,14 @@ export const Home = ({ move, notify, t }) => (
         ['🛡️', t.features.secureAssistance, t.features.secureAssistanceDesc]
       ].map(x => (
         <article key={x[1]}>
-          <b>{x[0]}</b>
-          <h3>{x[1]}</h3>
+          <b aria-hidden="true">{x[0]}</b>
+          <h2>{x[1]}</h2>
           <p>{x[2]}</p>
         </article>
       ))}
     </section>
     <Info t={t} />
-    <PrivacyPolicyPage t={t} />
+    <PrivacyPolicyPage t={t} embedded />
     <Responsible t={t} />
   </>
 );
@@ -1468,11 +1472,11 @@ export const PwaInstallBanner = ({ t }) => {
   return (
     <div className="pwa-install-banner" role="region" aria-label="Install App Prompt">
       <div className="pwa-banner-left">
-        <div className="pwa-banner-icon">
+        <div className="pwa-banner-icon" aria-hidden="true">
           ⚡
         </div>
         <div className="pwa-banner-text">
-          <h3>{bannerText.title}</h3>
+          <p className="pwa-banner-title">{bannerText.title}</p>
           <p>{bannerText.desc}</p>
         </div>
       </div>
