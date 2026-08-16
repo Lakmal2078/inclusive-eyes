@@ -58,12 +58,27 @@ async function currentUser(): Promise<FastCashUser | null> {
   const authUser = data.user;
   if (!authUser) return null;
 
-  const [{ data: profile }, { data: roles }] = await Promise.all([
+  const [{ data: existingProfile }, { data: roles }] = await Promise.all([
     supabase.from("profiles").select("full_name, player_id, email").eq("id", authUser.id).maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", authUser.id),
   ]);
 
+  let profile = existingProfile;
+  if (!profile) {
+    // First sign-in after email confirmation: create the profile from signup metadata.
+    const meta = (authUser.user_metadata ?? {}) as { full_name?: string; player_id?: string | null };
+    const row = {
+      id: authUser.id,
+      full_name: meta.full_name ?? "",
+      player_id: meta.player_id ? String(meta.player_id) : null,
+      email: authUser.email ?? null,
+    };
+    const { data: created } = await supabase.from("profiles").upsert(row).select("full_name, player_id, email").maybeSingle();
+    profile = created ?? { full_name: row.full_name, player_id: row.player_id, email: row.email };
+  }
+
   const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
+
   return {
     id: authUser.id,
     email: profile?.email ?? authUser.email ?? null,
@@ -98,28 +113,44 @@ async function submitTransaction(type: "DEPOSIT" | "WITHDRAWAL", body: Record<st
   }
 
   const { data: auth } = await supabase.auth.getUser();
-  const { data, error } = await supabase
-    .from("transactions")
-    .insert({
-      user_id: auth.user?.id ?? null,
-      type,
-      amount,
-      player_id: body["playerId"] ?? null,
-      payment_method: body["paymentMethod"] ?? null,
-      receipt_reference: body["receiptReference"] ?? null,
-      receipt_image: body["receiptImage"] ?? null,
-      security_code: body["securityCode"] ?? null,
-      full_name: body["fullName"] ?? null,
-      bank: body["bank"] ?? null,
-      account_number: body["accountNumber"] ?? null,
-      contact_number: body["contactNumber"] ?? null,
-    })
-    .select()
-    .maybeSingle();
+  const userId = auth.user?.id ?? null;
+  const reference = `TXN${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+  const payload = {
+    reference,
+    user_id: userId,
+    type,
+    amount,
+    player_id: body["playerId"] ?? null,
+    payment_method: body["paymentMethod"] ?? null,
+    receipt_reference: body["receiptReference"] ?? null,
+    receipt_image: body["receiptImage"] ?? null,
+    security_code: body["securityCode"] ?? null,
+    full_name: body["fullName"] ?? null,
+    bank: body["bank"] ?? null,
+    account_number: body["accountNumber"] ?? null,
+    contact_number: body["contactNumber"] ?? null,
+  };
 
+  // Guests cannot read rows back (no anonymous read access), so never ask for a
+  // representation when there is no session — that read is what RLS rejects.
+  if (!userId) {
+    const { error } = await supabase.from("transactions").insert(payload);
+    if (error) fail(error.message);
+    return {
+      transaction: camelTx({
+        ...payload,
+        id: reference,
+        status: "PENDING",
+        created_at: new Date().toISOString(),
+      } as Record<string, unknown>),
+    };
+  }
+
+  const { data, error } = await supabase.from("transactions").insert(payload).select().maybeSingle();
   if (error || !data) fail(error?.message ?? "Could not submit your request.");
   return { transaction: camelTx(data as Record<string, unknown>) };
 }
+
 
 function supportReply(message: string) {
   const text = message.toLowerCase();
@@ -167,7 +198,9 @@ export async function api(url: string, options: Options = {}): Promise<any> {
       },
     });
     if (error) fail(error.message);
-    if (data.user) {
+    // With email confirmation on, signUp returns no session; the profile write
+    // would then be rejected. Only write it when the user is actually signed in.
+    if (data.user && data.session) {
       await supabase.from("profiles").upsert({
         id: data.user.id,
         full_name: String(body.fullName ?? ""),
@@ -175,8 +208,13 @@ export async function api(url: string, options: Options = {}): Promise<any> {
         email,
       });
     }
+    if (!data.session) {
+      return { user: null, pendingConfirmation: true, message: "Check your email to confirm your account, then sign in." };
+    }
     return { user: await currentUser() };
   }
+
+
 
   if (url === "/api/auth/logout" && method === "POST") {
     await supabase.auth.signOut();
