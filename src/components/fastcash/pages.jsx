@@ -1223,10 +1223,16 @@ export const Register = ({ form, setForm, notify, setUser, move, t }) => (
       try {
         console.log('[Register] Submitting account creation form:', { email: form.email, fullName: form.fullName, playerId: form.playerId });
         const x = await api('/api/auth/register', { method: 'POST', body: JSON.stringify(form) });
-        setUser(x.user);
         setForm({});
+        if (x.pendingConfirmation) {
+          notify(x.message);
+          move('Login');
+          return;
+        }
+        setUser(x.user);
         notify(t.messages.accountCreated);
         move('Home');
+
       } catch (error) {
         console.error('[Register Failure]', error);
         notify(error.message);
