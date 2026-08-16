@@ -206,7 +206,7 @@ export const PrivacyPolicyPage = ({ t, embedded = false }) => {
     <p style={{ color: 'var(--muted)', fontSize: '15px', marginBottom: '28px' }}>{t?.privacyPage?.subtitle}</p>
     <div style={{ display: 'grid', gap: '20px' }}>
       <article style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '14px', border: '1px solid var(--line)' }}>
-        <h3 style={{ color: 'var(--green)', margin: '0 0 10px', fontSize: '17px' }}>{t?.privacyPage?.section1Title}</h3>
+        <SectionTitle style={{ color: 'var(--green)', margin: '0 0 10px', fontSize: '17px' }}>{t?.privacyPage?.section1Title}</SectionTitle>
         <p style={{ fontSize: '14px', margin: '0 0 12px', color: 'var(--ink)' }}>{t?.privacyPage?.section1Desc}</p>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '8px', fontSize: '14px', color: 'var(--muted)' }}>
           <li>{t?.privacyPage?.s1Item1}</li>
@@ -216,7 +216,7 @@ export const PrivacyPolicyPage = ({ t, embedded = false }) => {
         </ul>
       </article>
       <article style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '14px', border: '1px solid var(--line)' }}>
-        <h3 style={{ color: 'var(--blue)', margin: '0 0 10px', fontSize: '17px' }}>{t?.privacyPage?.section2Title}</h3>
+        <SectionTitle style={{ color: 'var(--blue)', margin: '0 0 10px', fontSize: '17px' }}>{t?.privacyPage?.section2Title}</SectionTitle>
         <p style={{ fontSize: '14px', margin: '0 0 12px', color: 'var(--ink)' }}>{t?.privacyPage?.section2Desc}</p>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '8px', fontSize: '14px', color: 'var(--muted)' }}>
           <li>{t?.privacyPage?.s2Item1}</li>
@@ -224,7 +224,7 @@ export const PrivacyPolicyPage = ({ t, embedded = false }) => {
         </ul>
       </article>
       <article style={{ background: 'rgba(255,255,255,0.03)', padding: '20px', borderRadius: '14px', border: '1px solid var(--line)' }}>
-        <h3 style={{ color: 'var(--green)', margin: '0 0 10px', fontSize: '17px' }}>{t?.privacyPage?.section3Title}</h3>
+        <SectionTitle style={{ color: 'var(--green)', margin: '0 0 10px', fontSize: '17px' }}>{t?.privacyPage?.section3Title}</SectionTitle>
         <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '8px', fontSize: '14px', color: 'var(--muted)' }}>
           <li>{t?.privacyPage?.s3Item1}</li>
           <li>{t?.privacyPage?.s3Item2}</li>
