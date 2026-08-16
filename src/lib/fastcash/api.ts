@@ -58,12 +58,27 @@ async function currentUser(): Promise<FastCashUser | null> {
   const authUser = data.user;
   if (!authUser) return null;
 
-  const [{ data: profile }, { data: roles }] = await Promise.all([
+  const [{ data: existingProfile }, { data: roles }] = await Promise.all([
     supabase.from("profiles").select("full_name, player_id, email").eq("id", authUser.id).maybeSingle(),
     supabase.from("user_roles").select("role").eq("user_id", authUser.id),
   ]);
 
+  let profile = existingProfile;
+  if (!profile) {
+    // First sign-in after email confirmation: create the profile from signup metadata.
+    const meta = (authUser.user_metadata ?? {}) as { full_name?: string; player_id?: string | null };
+    const row = {
+      id: authUser.id,
+      full_name: meta.full_name ?? "",
+      player_id: meta.player_id ? String(meta.player_id) : null,
+      email: authUser.email ?? null,
+    };
+    const { data: created } = await supabase.from("profiles").upsert(row).select("full_name, player_id, email").maybeSingle();
+    profile = created ?? { full_name: row.full_name, player_id: row.player_id, email: row.email };
+  }
+
   const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === "admin");
+
   return {
     id: authUser.id,
     email: profile?.email ?? authUser.email ?? null,
