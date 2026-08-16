@@ -522,7 +522,7 @@ export default function AdminPanel({ user, setUser, api, notify, lang = 'en', t,
                   <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--green)' }}>
                     {isAddingNew ? (adminT.addModalTitle || '➕ Add New Payment Account') : (adminT.editModalTitle || '✏️ Edit Payment Account')}
                   </h3>
-                  <button type="button" onClick={cancelAccountEdit} style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: '18px', cursor: 'pointer' }}>×</button>
+                  <button type="button" onClick={cancelAccountEdit} aria-label={adminT.cancelBtn || 'Close account editor'} style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: '18px', cursor: 'pointer' }}><span aria-hidden="true">×</span></button>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
@@ -652,7 +652,7 @@ export default function AdminPanel({ user, setUser, api, notify, lang = 'en', t,
                     <button
                       type="button"
                       onClick={() => handleToggleActive(acc)}
-                      title={acc.active === false ? 'Show to users' : 'Hide from users'}
+                      aria-label={`${acc.active === false ? 'Show' : 'Hide'} ${acc.name} for users`}
                       style={{
                         padding: '6px 12px',
                         borderRadius: '6px',
@@ -669,6 +669,7 @@ export default function AdminPanel({ user, setUser, api, notify, lang = 'en', t,
                     <button
                       type="button"
                       onClick={() => startEditAccount(acc)}
+                      aria-label={`${adminT.editAccount || 'Edit'} ${acc.name}`}
                       style={{
                         padding: '6px 12px',
                         borderRadius: '6px',
@@ -685,6 +686,7 @@ export default function AdminPanel({ user, setUser, api, notify, lang = 'en', t,
                     <button
                       type="button"
                       onClick={() => handleDeleteAccount(acc.id)}
+                      aria-label={`${adminT.deleteAccount || 'Delete'} ${acc.name}`}
                       disabled={bankAccounts.length <= 1}
                       style={{
                         padding: '6px 12px',
