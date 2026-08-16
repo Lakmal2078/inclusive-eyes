@@ -183,7 +183,9 @@ export async function api(url: string, options: Options = {}): Promise<any> {
       },
     });
     if (error) fail(error.message);
-    if (data.user) {
+    // With email confirmation on, signUp returns no session; the profile write
+    // would then be rejected. Only write it when the user is actually signed in.
+    if (data.user && data.session) {
       await supabase.from("profiles").upsert({
         id: data.user.id,
         full_name: String(body.fullName ?? ""),
@@ -191,8 +193,13 @@ export async function api(url: string, options: Options = {}): Promise<any> {
         email,
       });
     }
+    if (!data.session) {
+      return { user: null, pendingConfirmation: true, message: "Check your email to confirm your account, then sign in." };
+    }
     return { user: await currentUser() };
   }
+
+
 
   if (url === "/api/auth/logout" && method === "POST") {
     await supabase.auth.signOut();
