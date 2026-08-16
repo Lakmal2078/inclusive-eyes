@@ -1,24 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+import { Home } from "@/components/fastcash/pages.jsx";
+import { useFastCash } from "@/lib/fastcash/FastCashContext";
+
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Fast Cash — 1xBet Deposit & Withdrawal Support in Sri Lanka" },
+      { name: "description", content: "Fast, simple deposit and withdrawal assistance for 1xBet players in Sri Lanka. Agent bank accounts, receipt upload and WhatsApp support." },
+      { property: "og:title", content: "Fast Cash — 1xBet Deposit & Withdrawal Support in Sri Lanka" },
+      { property: "og:description", content: "Fast, simple deposit and withdrawal assistance for 1xBet players in Sri Lanka. Agent bank accounts, receipt upload and WhatsApp support." },
+    ],
+  }),
+  component: Page,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
+function Page() {
+  const { move, notify, t } = useFastCash();
+  return <Home move={move} notify={notify} t={t} />;
 }
