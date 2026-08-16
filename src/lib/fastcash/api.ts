@@ -98,28 +98,44 @@ async function submitTransaction(type: "DEPOSIT" | "WITHDRAWAL", body: Record<st
   }
 
   const { data: auth } = await supabase.auth.getUser();
-  const { data, error } = await supabase
-    .from("transactions")
-    .insert({
-      user_id: auth.user?.id ?? null,
-      type,
-      amount,
-      player_id: body["playerId"] ?? null,
-      payment_method: body["paymentMethod"] ?? null,
-      receipt_reference: body["receiptReference"] ?? null,
-      receipt_image: body["receiptImage"] ?? null,
-      security_code: body["securityCode"] ?? null,
-      full_name: body["fullName"] ?? null,
-      bank: body["bank"] ?? null,
-      account_number: body["accountNumber"] ?? null,
-      contact_number: body["contactNumber"] ?? null,
-    })
-    .select()
-    .maybeSingle();
+  const userId = auth.user?.id ?? null;
+  const reference = `TXN${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+  const payload = {
+    reference,
+    user_id: userId,
+    type,
+    amount,
+    player_id: body["playerId"] ?? null,
+    payment_method: body["paymentMethod"] ?? null,
+    receipt_reference: body["receiptReference"] ?? null,
+    receipt_image: body["receiptImage"] ?? null,
+    security_code: body["securityCode"] ?? null,
+    full_name: body["fullName"] ?? null,
+    bank: body["bank"] ?? null,
+    account_number: body["accountNumber"] ?? null,
+    contact_number: body["contactNumber"] ?? null,
+  };
 
+  // Guests cannot read rows back (no anonymous read access), so never ask for a
+  // representation when there is no session — that read is what RLS rejects.
+  if (!userId) {
+    const { error } = await supabase.from("transactions").insert(payload);
+    if (error) fail(error.message);
+    return {
+      transaction: camelTx({
+        ...payload,
+        id: reference,
+        status: "PENDING",
+        created_at: new Date().toISOString(),
+      } as Record<string, unknown>),
+    };
+  }
+
+  const { data, error } = await supabase.from("transactions").insert(payload).select().maybeSingle();
   if (error || !data) fail(error?.message ?? "Could not submit your request.");
   return { transaction: camelTx(data as Record<string, unknown>) };
 }
+
 
 function supportReply(message: string) {
   const text = message.toLowerCase();
