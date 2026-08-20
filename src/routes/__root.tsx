@@ -75,7 +75,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-const appUrl = import.meta.env.VITE_APP_URL || "https://inclusive-eyes.lovable.app";
+const appUrl = import.meta.env["VITE_APP_URL"] || "https://inclusive-eyes.lovable.app";
 const ogImage = `${appUrl}/og-image.png`;
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
