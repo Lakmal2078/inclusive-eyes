@@ -45,7 +45,17 @@ Open http://localhost:8080
 
 Change the port with `PORT=3000 npm run dev`.
 
-## 5. Verify the install
+## 5. Run the production build locally
+
+```bash
+npm run build
+npm start
+```
+
+Open the URL printed in the terminal (usually `http://localhost:8787` for the Wrangler preview server).
+Use `wrangler dev --cwd ./dist --port 3000` to change the preview port.
+
+## 6. Verify the install
 
 - Home page loads with header, bottom nav and footer
 - `/deposit` shows agent accounts (proves the database read works)
