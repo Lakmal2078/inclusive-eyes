@@ -22,7 +22,8 @@ The app builds to an edge/server bundle plus static assets.
 ```bash
 npm install
 npm run build
-npm run preview     # local smoke test of the production build
+npm start           # local smoke test of the production build
+# or: npm run preview
 ```
 
 Deploy the build output to a platform that supports the Nitro/edge output (Cloudflare Workers, Netlify, Vercel). Requirements:
