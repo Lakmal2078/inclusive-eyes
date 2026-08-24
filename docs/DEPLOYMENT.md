@@ -22,7 +22,7 @@ The app builds to an edge/server bundle plus static assets.
 ```bash
 npm install
 npm run build
-npm start           # local smoke test of the production build
+npm start           # local smoke test of the production build (runs on http://localhost:8787)
 # or: npm run preview
 ```
 

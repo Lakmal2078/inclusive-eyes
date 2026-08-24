@@ -52,8 +52,8 @@ npm run build
 npm start
 ```
 
-Open the URL printed in the terminal (usually `http://localhost:4173` or `http://localhost:8080`).
-Use `PORT=3000 npm start` to change the preview port.
+Open the URL printed in the terminal (usually `http://localhost:8787` for the Wrangler preview server).
+Use `wrangler dev --cwd ./dist --port 3000` to change the preview port.
 
 ## 6. Verify the install
 
