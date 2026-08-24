@@ -69,6 +69,7 @@ Full steps: [docs/INSTALLATION.md](docs/INSTALLATION.md)
 | `npm run dev` | Dev server on port 8080 |
 | `npm run build` | Production build |
 | `npm run build:dev` | Development-mode build (used for preview checks) |
+| `npm start` | Serve the production build (run after `npm run build`) |
 | `npm run preview` | Serve the production build locally |
 | `npm run lint` | ESLint |
 | `npm run format` | Prettier |
