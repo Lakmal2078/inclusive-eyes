@@ -1,0 +1,26 @@
+# Base44 development environment for the Fast Cash (TanStack Start) app.
+# Runs the cloned source via Vite's live-reload dev server — never a prebuilt image.
+services:
+  web:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - .:/app
+      # Keep container-installed node_modules out of the host bind mount so host
+      # and container never fight over platform-specific binaries.
+      - /app/node_modules
+    ports:
+      - "3000:8080"
+    environment:
+      # Reference the variable, never the resolved value — it changes per environment.
+      - BASE44_PUBLIC_HOST_SUFFIX=${BASE44_PUBLIC_HOST_SUFFIX}
+    # Platform-delivered external secrets (Supabase). Listed LAST so it always wins.
+    env_file:
+      - /run/base44/app.env
+    command: sh /app/.base44/dev-entrypoint.sh
+    healthcheck:
+      test: ["CMD", "node", "-e", "const http=require('http');const r=http.get('http://127.0.0.1:8080/',()=>process.exit(0));r.on('error',()=>process.exit(1));"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
