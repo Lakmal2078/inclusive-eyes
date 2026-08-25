@@ -8,8 +8,9 @@ set -e
 export VITE_SUPABASE_URL="${SUPABASE_URL}"
 export VITE_SUPABASE_PUBLISHABLE_KEY="${SUPABASE_PUBLISHABLE_KEY}"
 
-# node_modules is bind-mounted from the host and persists across restarts.
-if [ ! -d node_modules ]; then
+# node_modules lives in an anonymous volume that persists across restarts but
+# starts empty — install when it isn't populated yet.
+if [ ! -f node_modules/.package-lock.json ]; then
   npm install --no-audit --no-fund
 fi
 
