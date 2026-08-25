@@ -443,7 +443,7 @@ export const Header = ({ page, move, user, logout, drawer, setDrawer, theme, tog
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <strong style={{ color: 'var(--green)', font: '800 16px Syne', letterSpacing: '1px' }}>VGSL</strong>
             <a 
-              href="https://1xbet.com/en/user/registration/" 
+              href="https://reffpa.com/L?tag=d_2481353m_1622c_&site=2481353&ad=1622" 
               target="_blank" 
               rel="noreferrer"
               className="green"
