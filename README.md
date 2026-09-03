@@ -4,7 +4,8 @@ Fast Cash is a multilingual deposit and withdrawal payment-support portal for 1x
 
 > **Important:** Fast Cash is an independent payment-support portal. It is not the 1xBet platform, does not provide betting odds or account balances, and must not request or store a user's 1xBet password or security credentials. The service is intended for users aged 18 and above.
 
-**Live application:** [https://inclusive-eyes.lovable.app](https://inclusive-eyes.lovable.app)
+**Live application:** 
+https://lakmal2078-inclusive-eyes.agent-1xfast-srilanka.workers.dev/
 
 ## Contents
 
