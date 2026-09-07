@@ -4,7 +4,7 @@ Fast Cash is a multilingual deposit and withdrawal payment-support portal for 1x
 
 > **Important:** Fast Cash is an independent payment-support portal. It is not the 1xBet platform, does not provide betting odds or account balances, and must not request or store a user's 1xBet password or security credentials. The service is intended for users aged 18 and above.
 
-**Live application:** [https://inclusive-eyes.lovable.app](https://inclusive-eyes.lovable.app)
+**Live application:** [https://lakmal2078-inclusive-eyes.agent-1xfast-srilanka.workers.dev](https://lakmal2078-inclusive-eyes.agent-1xfast-srilanka.workers.dev)
 
 ## Contents
 
@@ -40,6 +40,7 @@ Fast Cash is a multilingual deposit and withdrawal payment-support portal for 1x
 | Responsive layout   | Uses CSS Grid and Flexbox for desktop, tablet, and mobile layouts. Admin tabs use equal-width columns on larger screens and uniform stacking on narrow screens.      |
 | Progressive Web App | Includes a web manifest, service worker, install icons, offline shell caching, and browser-specific installation guidance.                                           |
 | Accessibility       | Includes labelled form fields, keyboard focus indicators, skip navigation, ARIA attributes for menus and dialogs, and responsive controls with usable touch targets. |
+| Sports tips         | Displays informational cricket and football picks (`SportsTips.jsx`), refreshed from The Odds API by a scheduled Supabase Edge Function; explicitly not a guarantee of winning. |
 
 ## Technology
 
@@ -50,6 +51,7 @@ Fast Cash is a multilingual deposit and withdrawal payment-support portal for 1x
 | Styling         | Tailwind CSS v4 plus the application stylesheet at `src/fastcash.css`                             |
 | Backend         | Supabase-compatible backend with Postgres, Auth, Row Level Security, and server-side API handlers |
 | Browser OCR     | Tesseract.js                                                                                      |
+| Edge functions  | Supabase Edge Function (`supabase/functions/update-sports-tips`) refreshing picks from The Odds API |
 | Server runtime  | Nitro output with Wrangler/Cloudflare-compatible worker configuration                             |
 | Package manager | npm; Bun can also be used when supported by the environment                                       |
 | PWA assets      | `public/manifest.webmanifest`, `public/sw.js`, and `public/icon-192.png` / `public/icon-512.png`  |
@@ -79,20 +81,29 @@ The application uses TanStack Router. Each route file is located in `src/routes/
 
 ```text
 src/
-├── components/fastcash/
-│   ├── AdminPanel.jsx       # Admin login and dashboard interface
-│   ├── pages.jsx            # Shared pages, header, drawer, cards, forms, and PWA banner
-│   └── ReceiptScanner.jsx   # Browser receipt OCR component
-├── integrations/supabase/   # Supabase client and authentication integration
+├── assets/
+│   └── app-icon.png         # App icon source asset
+├── components/
+│   ├── fastcash/
+│   │   ├── AdminPanel.jsx     # Admin login and dashboard interface
+│   │   ├── pages.jsx          # Shared pages, header, drawer, cards, forms, and PWA banner
+│   │   ├── ReceiptScanner.jsx # Browser receipt OCR component
+│   │   └── SportsTips.jsx     # Free cricket/football tips panel
+│   └── ui/                    # Shared shadcn/ui-style UI primitives (46 components)
+├── hooks/
+│   └── use-mobile.tsx        # Responsive/mobile breakpoint hook
+├── integrations/supabase/    # Supabase client and authentication integration
 ├── lib/fastcash/
-│   ├── api.ts               # Frontend API/data access helper
-│   ├── FastCashContext.tsx  # Shared navigation, session, theme, and form state
-│   └── translations.js      # English, Sinhala, and Tamil translations
-├── routes/                  # TanStack Router route files
-├── fastcash.css             # Fast Cash design tokens and responsive layout rules
-├── styles.css               # Tailwind and global styles
-├── router.tsx               # Router setup
-└── start.ts                 # TanStack Start middleware and server setup
+│   ├── api.ts                # Frontend API/data access helper
+│   ├── FastCashContext.tsx   # Shared navigation, session, theme, and form state
+│   └── translations.js       # English, Sinhala, and Tamil translations
+├── routes/                   # TanStack Router route files (see routes/README.md for conventions)
+├── types/
+│   └── fastcash-modules.d.ts # Ambient type declarations
+├── fastcash.css              # Fast Cash design tokens and responsive layout rules
+├── styles.css                # Tailwind and global styles
+├── router.tsx                # Router setup
+└── start.ts                  # TanStack Start middleware and server setup
 public/
 ├── manifest.webmanifest     # PWA metadata
 ├── sw.js                    # PWA service worker
@@ -102,8 +113,11 @@ public/
 ├── og-image.png             # Social sharing image
 └── robots.txt
 supabase/
-└── migrations/              # Database schema and policy migrations
-docs/                        # Operational, API, installation, and security guides
+├── config.toml               # Supabase project configuration
+├── functions/
+│   └── update-sports-tips/   # Edge function that refreshes sports tips from The Odds API
+└── migrations/                # Database schema and policy migrations
+docs/                          # Operational, API, installation, and security guides
 ```
 
 ## Requirements
@@ -163,6 +177,9 @@ Create `.env` in the project root when it is not already supplied by the deploym
 | `VITE_APP_URL`                  | Optional browser value | Absolute production URL used for social image metadata |
 | `PORT`                          | Optional runtime value | Development server port override                       |
 | `NODE_OPTIONS`                  | Optional build value   | Memory override for constrained devices                |
+| `ODDS_API_KEY`                  | Server / Edge Function | API key for The Odds API, used by the sports-tips edge function |
+| `ODDS_API_SPORT_KEYS`           | Server / Edge Function | Optional comma-separated list of Odds API sport keys to fetch   |
+| `CRON_SECRET`                   | Server / Edge Function | Shared secret that authorizes the scheduled sports-tips refresh |
 
 Never place service-role keys, database passwords, or other secrets in a `VITE_*` variable. Anything prefixed with `VITE_` is bundled into browser code. After changing `.env`, restart the development server and rebuild before testing the change.
 
@@ -170,15 +187,17 @@ WhatsApp number, transaction limits, and the promo code are application settings
 
 ## Available scripts
 
-| Command             | Purpose                                                                                     |
-| ------------------- | ------------------------------------------------------------------------------------------- |
-| `npm run dev`       | Start the Vite development server, normally on port `8080`.                                 |
-| `npm run build`     | Create the production client and Nitro server output.                                       |
-| `npm run build:dev` | Create a development-mode Vite build.                                                       |
-| `npm start`         | Run the generated production preview through Wrangler using `.output/server/wrangler.json`. |
-| `npm run preview`   | Alias for `npm start`.                                                                      |
-| `npm run lint`      | Run the repository ESLint configuration.                                                    |
-| `npm run format`    | Format project files with Prettier.                                                         |
+| Command              | Purpose                                                                    |
+| -------------------- | ---------------------------------------------------------------------------- |
+| `npm run dev`        | Start the Vite development server, normally on port `8080`.                |
+| `npm run build`      | Create the production client and Nitro server output.                      |
+| `npm run build:dev`  | Create a development-mode Vite build.                                      |
+| `npm run build:node` | Create a Nitro build using the `node-server` preset.                       |
+| `npm start`          | Run the built output with `node .output/server/index.mjs`.                 |
+| `npm run preview`    | Run `build:node` and then `start`, for a local production-style preview.   |
+| `npm run deploy`     | Build the project and deploy the generated output with `wrangler deploy`.  |
+| `npm run lint`       | Run the repository ESLint configuration.                                   |
+| `npm run format`     | Format project files with Prettier.                                        |
 
 ## User and admin workflows
 
@@ -275,5 +294,12 @@ Treat receipts, bank details, contact numbers, security codes, and transaction r
 | [`docs/SECURITY_CHECKLIST.md`](docs/SECURITY_CHECKLIST.md)     | Security acceptance checks                                         |
 | [`docs/TESTING_CHECKLIST.md`](docs/TESTING_CHECKLIST.md)       | Functional and regression test checklist                           |
 | [`docs/PRODUCTION_CHECKLIST.md`](docs/PRODUCTION_CHECKLIST.md) | Production readiness checklist                                     |
+| [`docs/SPORTS_TIPS_SETUP.md`](docs/SPORTS_TIPS_SETUP.md)       | Setup for the free cricket/football tips feature (Odds API, edge function, migration) |
+| [`docs/AGENTS.md`](docs/AGENTS.md)                              | Notes and constraints for AI coding agents working on this repo    |
+| [`docs/APP_TEST_REPORT.md`](docs/APP_TEST_REPORT.md)            | Dated application test report                                      |
+| [`docs/FREE-TIPS-ASSESSMENT-SI.md`](docs/FREE-TIPS-ASSESSMENT-SI.md) | Sinhala-language assessment of the free tips system            |
+| [`docs/LAYOUT_VERIFICATION.md`](docs/LAYOUT_VERIFICATION.md)    | Notes from browser layout verification passes                      |
+| [`docs/VERIFICATION_NOTES.md`](docs/VERIFICATION_NOTES.md)      | General fix/build verification notes                                |
 
 Maintained for the Fast Cash project.
+
