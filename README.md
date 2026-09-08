@@ -1,245 +1,274 @@
+```markdown
 # Fast Cash
 
-Fast Cash is a multilingual deposit and withdrawal payment-support portal for 1xBet players in Sri Lanka. Users can submit deposit or withdrawal requests, attach payment receipts, review transaction status, contact an agent, and use the browser-based receipt scanner. Authorized administrators can manage payment accounts, system settings, users, and transaction requests from the protected admin dashboard.
+**Fast Cash** යනු ශ්‍රී ලංකාවේ Bet ක්‍රීඩකයන් සඳහා නිර්මාණය කරන ලද බහුභාෂා තැන්පතු සහ මුදල් ආපසු ගැනීමේ ගෙවීම්-සහාය ද්වාරයකි. පරිශීලකයන්ට තැන්පතු හෝ මුදල් ආපසු ගැනීමේ ඉල්ලීම් ඉදිරිපත් කිරීමට, ගෙවීම් ලදුපත් අමුණා ගැනීමට, ගනුදෙනු තත්ත්වය සමාලෝචනය කිරීමට, නියෝජිතයෙකු සම්බන්ධ කර ගැනීමට සහ බ්‍රවුසර් මත පදනම් වූ ලදුපත් ස්කෑනරය භාවිතා කිරීමට හැකිය. අනුමත පරිපාලකයන්ට ආරක්ෂිත පරිපාලක උපකරණ පුවරුවෙන් ගෙවීම් ගිණුම්, පද්ධති සැකසුම්, පරිශීලකයන් සහ ගනුදෙනු ඉල්ලීම් කළමනාකරණය කළ හැක.
 
-> **Important:** Fast Cash is an independent payment-support portal. It is not the 1xBet platform, does not provide betting odds or account balances, and must not request or store a user's 1xBet password or security credentials. The service is intended for users aged 18 and above.
+> **වැදගත්**  
+> Fast Cash යනු ස්වාධීන ගෙවීම්-සහාය ද්වාරයකි. එය 1xBet වේදිකාව **නොවේ**, ඔට්ටු අනුපාත හෝ ගිණුම් ශේෂයන් සපයන්නේ නැත, සහ පරිශීලකයෙකුගේ 1xBet මුරපදය හෝ ආරක්ෂක අක්තපත්‍ර ඉල්ලා සිටීම හෝ ගබඩා කිරීම කිසිසේත්ම නොකළ යුතුය. මෙම සේවාව අවුරුදු 18 සහ ඊට වැඩි පරිශීලකයන් සඳහා පමණක් අදහස් කෙරේ.
 
-**Live application:** [https://lakmal2078-inclusive-eyes.agent-1xfast-srilanka.workers.dev](https://lakmal2078-inclusive-eyes.agent-1xfast-srilanka.workers.dev)
+**සජීවී යෙදුම:** [https://lakmal2078-inclusive-eyes.agent-1xfast-srilanka.workers.dev](https://lakmal2078-inclusive-eyes.agent-1xfast-srilanka.workers.dev)
 
-## Contents
+## අන්තර්ගතය
 
-- [Features](#features)
-- [Technology](#technology)
-- [Application routes](#application-routes)
-- [Project structure](#project-structure)
-- [Requirements](#requirements)
-- [Local setup](#local-setup)
-- [Environment configuration](#environment-configuration)
-- [Available scripts](#available-scripts)
-- [User and admin workflows](#user-and-admin-workflows)
-- [PWA installation](#pwa-installation)
-- [Testing and verification](#testing-and-verification)
-- [Deployment](#deployment)
-- [Termux and proot-distro](#termux-and-proot-distro)
-- [Troubleshooting](#troubleshooting)
-- [Security and operational notes](#security-and-operational-notes)
-- [Documentation](#documentation)
+- [විශේෂාංග](#විශේෂාංග)
+- [තාක්ෂණය](#තාක්ෂණය)
+- [යෙදුම් මාර්ග](#යෙදුම්-මාර්ග)
+- [ව්‍යාපෘති ව්‍යුහය](#ව්‍යාපෘති-ව්‍යුහය)
+- [අවශ්‍යතා](#අවශ්‍යතා)
+- [දේශීය සැකසුම](#දේශීය-සැකසුම)
+- [පරිසර වින්‍යාසය](#පරිසර-වින්‍යාසය)
+- [ලබා ගත හැකි ස්ක්‍රිප්ට්](#ලබා-ගත-හැකි-ස්ක්‍රිප්ට්)
+- [පරිශීලක සහ පරිපාලක ක්‍රියා ප්‍රවාහ](#පරිශීලක-සහ-පරිපාලක-ක්‍රියා-ප්‍රවාහ)
+- [PWA ස්ථාපනය](#pwa-ස්ථාපනය)
+- [පරීක්ෂණ සහ සත්‍යාපනය](#පරීක්ෂණ-සහ-සත්‍යාපනය)
+- [උපයෝගීතාව](#උපයෝගීතාව)
+- [Termux සහ proot-distro](#termux-සහ-proot-distro)
+- [දෝෂ නිරාකරණය](#දෝෂ-නිරාකරණය)
+- [ආරක්ෂාව සහ මෙහෙයුම් සටහන්](#ආරක්ෂාව-සහ-මෙහෙයුම්-සටහන්)
+- [ලේඛන](#ලේඛන)
 
-## Features
+## විශේෂාංග
 
-| Area                | Current behavior                                                                                                                                                     |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Deposit requests    | Displays active agent bank or payment accounts, validates amount limits, accepts Player ID and payment method, and optionally attaches a receipt image.              |
-| Withdrawal requests | Collects Player ID, security code, recipient bank details, amount, and contact information for agent review.                                                         |
-| Receipt OCR         | Uses Tesseract.js in the browser to detect receipt amount and reference details; no OCR server is required.                                                          |
-| Transaction history | Authenticated users can review their own requests and statuses such as `PENDING`, `APPROVED`, `COMPLETED`, `REJECTED`, `CANCELLED`, and `PROCESSING`.                |
-| Authentication      | Email and password registration and login are backed by Supabase Auth. Email confirmation may be required by the backend configuration.                              |
-| Admin dashboard     | Server-authorized administrators can view overview statistics, process transactions, manage agent payment accounts, edit system settings, and review users.          |
-| Support             | Includes a rule-based support assistant, FAQ content, WhatsApp contact actions, promotional information, privacy policy, and responsible-gambling notices.           |
-| Languages and theme | Supports English, සිංහල, and தமிழ், together with dark and light themes. The selected language is synchronized with the document language.                           |
-| Responsive layout   | Uses CSS Grid and Flexbox for desktop, tablet, and mobile layouts. Admin tabs use equal-width columns on larger screens and uniform stacking on narrow screens.      |
-| Progressive Web App | Includes a web manifest, service worker, install icons, offline shell caching, and browser-specific installation guidance.                                           |
-| Accessibility       | Includes labelled form fields, keyboard focus indicators, skip navigation, ARIA attributes for menus and dialogs, and responsive controls with usable touch targets. |
-| Sports tips         | Displays informational cricket and football picks (`SportsTips.jsx`), refreshed from The Odds API by a scheduled Supabase Edge Function; explicitly not a guarantee of winning. |
+| ක්ෂේත්‍රය              | වර්තමාන හැසිරීම |
+|------------------------|-----------------|
+| තැන්පතු ඉල්ලීම්       | සක්‍රීය නියෝජිත බැංකු හෝ ගෙවීම් ගිණුම් පෙන්වයි, මුදල් සීමාවන් වලංගු කරයි, Player ID සහ ගෙවීම් ක්‍රමය පිළිගනී, සහ අවශ්‍ය නම් ලදුපත් රූපයක් අමුණා ගනී. |
+| මුදල් ආපසු ගැනීමේ ඉල්ලීම් | Player ID, ආරක්ෂක කේතය, ලබන්නාගේ බැංකු විස්තර, මුදල සහ සම්බන්ධතා තොරතුරු රැස් කර නියෝජිත සමාලෝචනය සඳහා ඉදිරිපත් කරයි. |
+| ලදුපත් OCR             | බ්‍රවුසරය තුළ Tesseract.js භාවිතා කර ලදුපත් මුදල සහ යොමු විස්තර හඳුනා ගනී; OCR සේවාදායකයක් අවශ්‍ය නොවේ. |
+| ගනුදෙනු ඉතිහාසය       | සත්‍යාපිත පරිශීලකයන්ට තමන්ගේම ඉල්ලීම් සහ තත්ත්වයන් (`PENDING`, `APPROVED`, `COMPLETED`, `REJECTED`, `CANCELLED`, `PROCESSING`) සමාලෝචනය කළ හැක. |
+| සත්‍යාපනය              | විද්‍යුත් තැපෑල සහ මුරපද ලියාපදිංචිය සහ පිවිසුම Supabase Auth මගින් සහාය දක්වයි. බැක්එන්ඩ් වින්‍යාසය අනුව විද්‍යුත් තැපෑල තහවුරු කිරීම අවශ්‍ය විය හැක. |
+| පරිපාලක උපකරණ පුවරුව | සේවාදායක-අනුමත පරිපාලකයන්ට සමස්ත සංඛ්‍යාලේඛන බැලීමට, ගනුදෙනු සැකසීමට, නියෝජිත ගෙවීම් ගිණුම් කළමනාකරණය කිරීමට, පද්ධති සැකසුම් සංස්කරණය කිරීමට සහ පරිශීලකයන් සමාලෝචනය කිරීමට හැකිය. |
+| සහාය                   | නීති-පාදක සහායක, FAQ අන්තර්ගතය, WhatsApp සම්බන්ධතා ක්‍රියා, ප්‍රවර්ධන තොරතුරු, රහස්‍යතා ප්‍රතිපත්තිය සහ වගකීම්සහගත සූදු දැන්වීම් ඇතුළත් වේ. |
+| භාෂා සහ තේමාව         | ඉංග්‍රීසි, සිංහල සහ தமிழ் සහාය දක්වයි, අඳුරු සහ ආලෝක තේමා සමඟ. තෝරාගත් භාෂාව ලේඛන භාෂාව සමඟ සමකාලීන කෙරේ. |
+| ප්‍රතිචාරාත්මක පිරිසැලසුම | ඩෙස්ක්ටොප්, ටැබ්ලට් සහ ජංගම පිරිසැලසුම් සඳහා CSS Grid සහ Flexbox භාවිතා කරයි. පරිපාලක ටැබ් විශාල තිරවල සමාන පළල තීරු සහ පටු තිරවල ඒකාකාර ස්ථරය භාවිතා කරයි. |
+| Progressive Web App   | වෙබ් මැනිෆෙස්ට්, සේවා කාර්මිකයා, ස්ථාපන අයිකන, නොබැඳි ෂෙල් කෑෂිං සහ බ්‍රවුසර-විශේෂිත ස්ථාපන මාර්ගෝපදේශ ඇතුළත් වේ. |
+| ප්‍රවේශ්‍යතාව         | ලේබල් කළ පෝරම ක්ෂේත්‍ර, යතුරුපුවරු නාභිගත දර්ශක, නාවික යාම මඟහැරීම, මෙනු සහ සංවාද සඳහා ARIA ගුණාංග සහ භාවිතා කළ හැකි ස්පර්ශ ඉලක්ක සහිත ප්‍රතිචාරාත්මක පාලන ඇතුළත් වේ. |
+| ක්‍රීඩා ඉඟි            | තොරතුරුමය ක්‍රිකට් සහ පාපන්දු තේරීම් (`SportsTips.jsx`) පෙන්වයි, The Odds API වෙතින් නියමිත Supabase Edge Function මගින් යාවත්කාලීන කෙරේ. ජයග්‍රහණයක් සහතික කරන්නේ **නැත**. |
 
-## Technology
+## තාක්ෂණය
 
-| Layer           | Technology                                                                                        |
-| --------------- | ------------------------------------------------------------------------------------------------- |
-| UI framework    | React 19 with TanStack Start v1 and TanStack Router file-based routes                             |
-| Build tool      | Vite 8                                                                                            |
-| Styling         | Tailwind CSS v4 plus the application stylesheet at `src/fastcash.css`                             |
-| Backend         | Supabase-compatible backend with Postgres, Auth, Row Level Security, and server-side API handlers |
-| Browser OCR     | Tesseract.js                                                                                      |
-| Edge functions  | Supabase Edge Function (`supabase/functions/update-sports-tips`) refreshing picks from The Odds API |
-| Server runtime  | Nitro output with Wrangler/Cloudflare-compatible worker configuration                             |
-| Package manager | npm; Bun can also be used when supported by the environment                                       |
-| PWA assets      | `public/manifest.webmanifest`, `public/sw.js`, and `public/icon-192.png` / `public/icon-512.png`  |
+| ස්ථරය           | තාක්ෂණය |
+|-----------------|---------|
+| UI රාමුව        | React 19 සමඟ TanStack Start v1 සහ TanStack Router (ගොනු-පාදක මාර්ග) |
+| ගොඩනැගීම් මෙවලම | Vite 8 |
+| විලාසිතා        | Tailwind CSS v4 + යෙදුම් ශෛලී පත්‍රය `src/fastcash.css` |
+| බැක්එන්ඩ්       | Supabase-ගැළපෙන බැක්එන්ඩ් (Postgres, Auth, Row Level Security, සේවාදායක-පාර්ශ්ව API හසුරුවන්නන්) |
+| බ්‍රවුසර OCR    | Tesseract.js |
+| Edge ශ්‍රිත     | Supabase Edge Function (`supabase/functions/update-sports-tips`) The Odds API වෙතින් තේරීම් යාවත්කාලීන කරයි |
+| සේවාදායක ධාවන කාලය | Nitro ප්‍රතිදානය සමඟ Wrangler / Cloudflare-ගැළපෙන worker වින්‍යාසය |
+| පැකේජ කළමනාකරු | npm (පරිසරය සහාය දක්වන විට Bun ද භාවිතා කළ හැක) |
+| PWA වත්කම්      | `public/manifest.webmanifest`, `public/sw.js`, `public/icon-192.png`, `public/icon-512.png` |
 
-## Application routes
+## යෙදුම් මාර්ග
 
-The application uses TanStack Router. Each route file is located in `src/routes/` and is also available through the corresponding URL path.
+යෙදුම TanStack Router භාවිතා කරයි. සෑම මාර්ග ගොනුවක්ම `src/routes/` තුළ පිහිටා ඇති අතර අනුරූප URL මාර්ගයෙන් ලබා ගත හැක.
 
-| Path              | Purpose                                                                                       | Access                                              |
-| ----------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| `/`               | Home page, feature cards, 1xBet information, privacy summary, and responsible-gambling notice | Public                                              |
-| `/deposit`        | Deposit request form and active agent payment accounts                                        | Public form; authentication may be used for history |
-| `/withdraw`       | Withdrawal request form                                                                       | Public form; authentication may be used for history |
-| `/transactions`   | User transaction history and status                                                           | Authenticated user data                             |
-| `/1xbet`          | 1xBet account and Player ID guide                                                             | Public                                              |
-| `/sports`         | Sports betting payment-support guide                                                          | Public                                              |
-| `/live-bet`       | Live betting payment-support guide                                                            | Public                                              |
-| `/casino`         | Casino and slots payment-support guide                                                        | Public                                              |
-| `/promotions`     | Promotions and agent promo-code information                                                   | Public                                              |
-| `/support`        | Support assistant, FAQ, and agent contact details                                             | Public                                              |
-| `/privacy-policy` | Full privacy policy                                                                           | Public                                              |
-| `/login`          | User account login                                                                            | Public                                              |
-| `/register`       | User account registration                                                                     | Public                                              |
-| `/admin`          | Administrator login and dashboard                                                             | Admin role required for dashboard data              |
+| මාර්ගය            | අරමුණ | ප්‍රවේශය |
+|-------------------|-------|---------|
+| `/`               | මුල් පිටුව, විශේෂාංග කාඩ්, 1xBet තොරතුරු, රහස්‍යතා සාරාංශය සහ වගකීම්සහගත සූදු දැන්වීම | පොදු |
+| `/deposit`        | තැන්පතු ඉල්ලීම් පෝරමය සහ සක්‍රීය නියෝජිත ගෙවීම් ගිණුම් | පොදු පෝරමය; ඉතිහාසය සඳහා සත්‍යාපනය භාවිතා කළ හැක |
+| `/withdraw`       | මුදල් ආපසු ගැනීමේ ඉල්ලීම් පෝරමය | පොදු පෝරමය; ඉතිහාසය සඳහා සත්‍යාපනය භාවිතා කළ හැක |
+| `/transactions`   | පරිශීලක ගනුදෙනු ඉතිහාසය සහ තත්ත්වය | සත්‍යාපිත පරිශීලක දත්ත |
+| `/1xbet`          | 1xBet ගිණුම සහ Player ID මාර්ගෝපදේශය | පොදු |
+| `/sports`         | ක්‍රීඩා ඔට්ටු ගෙවීම්-සහාය මාර්ගෝපදේශය | පොදු |
+| `/live-bet`       | සජීවී ඔට්ටු ගෙවීම්-සහාය මාර්ගෝපදේශය | පොදු |
+| `/casino`         | කැසිනෝ සහ ස්ලොට් ගෙවීම්-සහාය මාර්ගෝපදේශය | පොදු |
+| `/promotions`     | ප්‍රවර්ධන සහ නියෝජිත ප්‍රෝමෝ-කේත තොරතුරු | පොදු |
+| `/support`        | සහායක, FAQ සහ නියෝජිත සම්බන්ධතා විස්තර | පොදු |
+| `/privacy-policy` | සම්පූර්ණ රහස්‍යතා ප්‍රතිපත්තිය | පොදු |
+| `/login`          | පරිශීලක ගිණුම් පිවිසුම | පොදු |
+| `/register`       | පරිශීලක ගිණුම් ලියාපදිංචිය | පොදු |
+| `/admin`          | පරිපාලක පිවිසුම සහ උපකරණ පුවරුව | උපකරණ පුවරු දත්ත සඳහා පරිපාලක භූමිකාව අවශ්‍යයි |
 
-## Project structure
+## ව්‍යාපෘති ව්‍යුහය
 
 ```text
 src/
 ├── assets/
-│   └── app-icon.png         # App icon source asset
+│   └── app-icon.png              # යෙදුම් අයිකන මූලාශ්‍ර වත්කම
 ├── components/
 │   ├── fastcash/
-│   │   ├── AdminPanel.jsx     # Admin login and dashboard interface
-│   │   ├── pages.jsx          # Shared pages, header, drawer, cards, forms, and PWA banner
-│   │   ├── ReceiptScanner.jsx # Browser receipt OCR component
-│   │   └── SportsTips.jsx     # Free cricket/football tips panel
-│   └── ui/                    # Shared shadcn/ui-style UI primitives (46 components)
+│   │   ├── AdminPanel.jsx        # පරිපාලක පිවිසුම සහ උපකරණ පුවරු අතුරුමුහුණත
+│   │   ├── pages.jsx             # හවුල් පිටු, ශීර්ෂකය, ඇදීම, කාඩ්, පෝරම සහ PWA බැනරය
+│   │   ├── ReceiptScanner.jsx    # බ්‍රවුසර ලදුපත් OCR සංරචකය
+│   │   └── SportsTips.jsx        # නොමිලේ ක්‍රිකට්/පාපන්දු ඉඟි පැනලය
+│   └── ui/                       # හවුල් shadcn/ui-විලාස UI ප්‍රාථමික
 ├── hooks/
-│   └── use-mobile.tsx        # Responsive/mobile breakpoint hook
-├── integrations/supabase/    # Supabase client and authentication integration
+│   └── use-mobile.tsx            # ප්‍රතිචාරාත්මක / ජංගම බිඳුම් ලක්ෂ්‍ය හුක්
+├── integrations/supabase/        # Supabase සේවාලාභියා සහ සත්‍යාපන ඒකාබද්ධතාව
 ├── lib/fastcash/
-│   ├── api.ts                # Frontend API/data access helper
-│   ├── FastCashContext.tsx   # Shared navigation, session, theme, and form state
-│   └── translations.js       # English, Sinhala, and Tamil translations
-├── routes/                   # TanStack Router route files (see routes/README.md for conventions)
+│   ├── api.ts                    # ඉදිරිපස API / දත්ත-ප්‍රවේශ උදව්කරු
+│   ├── FastCashContext.tsx       # හවුල් නාවිකය, සැසිය, තේමාව සහ පෝරම තත්ත්වය
+│   └── translations.js           # ඉංග්‍රීසි, සිංහල සහ தமிழ் පරිවර්තන
+├── routes/                       # TanStack Router මාර්ග ගොනු
 ├── types/
-│   └── fastcash-modules.d.ts # Ambient type declarations
-├── fastcash.css              # Fast Cash design tokens and responsive layout rules
-├── styles.css                # Tailwind and global styles
-├── router.tsx                # Router setup
-└── start.ts                  # TanStack Start middleware and server setup
+│   └── fastcash-modules.d.ts     # පරිසර වර්ග ප්‍රකාශන
+├── fastcash.css                  # Fast Cash නිර්මාණ ටෝකන සහ ප්‍රතිචාරාත්මක පිරිසැලසුම් නීති
+├── styles.css                    # Tailwind සහ ගෝලීය ශෛලී
+├── router.tsx                    # රවුටර සැකසුම
+└── start.ts                      # TanStack Start මධ්‍යස්ථතා සහ සේවාදායක සැකසුම
+
 public/
-├── manifest.webmanifest     # PWA metadata
-├── sw.js                    # PWA service worker
-├── icon-192.png             # PWA install icon
-├── icon-512.png             # PWA install icon
-├── favicon.png              # Browser favicon
-├── og-image.png             # Social sharing image
+├── manifest.webmanifest          # PWA පාරදත්ත
+├── sw.js                         # PWA සේවා කාර්මිකයා
+├── icon-192.png                  # PWA ස්ථාපන අයිකනය
+├── icon-512.png                  # PWA ස්ථාපන අයිකනය
+├── favicon.png                   # බ්‍රවුසර favicon
+├── og-image.png                  # සමාජ බෙදාගැනීමේ රූපය
 └── robots.txt
+
 supabase/
-├── config.toml               # Supabase project configuration
+├── config.toml                   # Supabase ව්‍යාපෘති වින්‍යාසය
 ├── functions/
-│   └── update-sports-tips/   # Edge function that refreshes sports tips from The Odds API
-└── migrations/                # Database schema and policy migrations
-docs/                          # Operational, API, installation, and security guides
+│   └── update-sports-tips/       # ක්‍රීඩා ඉඟි යාවත්කාලීන කරන Edge ශ්‍රිතය
+└── migrations/                   # දත්ත සමුදා යෝජනා ක්‍රමය සහ ප්‍රතිපත්ති සංක්‍රමණ
+
+docs/                             # මෙහෙයුම්, API, ස්ථාපන සහ ආරක්ෂක මාර්ගෝපදේශ
 ```
 
-## Requirements
+## අවශ්‍යතා
 
-Use **Node.js 20 or newer** and npm 10 or newer. The application also needs internet access because the frontend communicates with the configured Supabase-compatible backend and Tesseract.js may download OCR language data in the browser. A provisioned Lovable Cloud or Supabase-compatible backend is required for authentication, data access, and administrator authorization.
+- **Node.js 20 හෝ ඊට නව** සහ **npm 10 හෝ ඊට නව**
+- අන්තර්ජාල ප්‍රවේශය (ඉදිරිපස වින්‍යාසිත Supabase-ගැළපෙන බැක්එන්ඩ් සමඟ සන්නිවේදනය කරයි; Tesseract.js බ්‍රවුසරය තුළ OCR භාෂා දත්ත බාගත කළ හැක)
+- සත්‍යාපනය, දත්ත ප්‍රවේශය සහ පරිපාලක අනුමැතිය සඳහා සපයන ලද Lovable Cloud හෝ Supabase-ගැළපෙන බැක්එන්ඩ්
 
-Check the installed versions before starting:
+ස්ථාපිත අනුවාද පරීක්ෂා කරන්න:
 
 ```bash
 node --version
 npm --version
 ```
 
-## Local setup
-
-From a ZIP export, extract the project and enter the project directory:
+## දේශීය සැකසුම
 
 ```bash
-unzip fast-cash-project.zip -d fast-cash
-cd fast-cash
-```
-
-Install dependencies and start the development server:
-
-```bash
+# යැපීම් ස්ථාපනය කරන්න
 npm install
+
+# සංවර්ධන සේවාදායකය ආරම්භ කරන්න (පෙරනිමි: http://localhost:8080)
 npm run dev
-```
 
-The development server normally runs at [http://localhost:8080](http://localhost:8080). The port can be changed with an environment variable:
-
-```bash
+# විකල්ප: පෝර්ට් වෙනස් කරන්න
 PORT=3000 npm run dev
 ```
 
-For a production-style local preview, build first and then start the generated Nitro/Wrangler server:
+නිෂ්පාදන-විලාස දේශීය පෙරදසුන:
 
 ```bash
 npm run build
 npm start
 ```
 
-The preview server normally uses port `8787`. The terminal output is the authority if the configured runtime selects another port.
+පෙරදසුන සේවාදායකය සාමාන්‍යයෙන් `8787` පෝර්ට් භාවිතා කරයි. සත්‍ය පෝර්ට් සඳහා සෑම විටම ටර්මිනල් ප්‍රතිදානය මත රඳා සිටින්න.
 
-## Environment configuration
+## පරිසර වින්‍යාසය
 
-Create `.env` in the project root when it is not already supplied by the deployment platform. The complete example is in [`.env.example`](.env.example), and the detailed reference is [`docs/ENVIRONMENT.md`](docs/ENVIRONMENT.md).
+ව්‍යාපෘති මූලයේ `.env` ගොනුවක් සාදන්න (හෝ වේදිකාවෙන් සපයන ලද පරිසරය භාවිතා කරන්න). සම්පූර්ණ උදාහරණය [`.env.example`](.env.example) හි ඇත. විස්තරාත්මක යොමුව: [`docs/ENVIRONMENT.md`](docs/ENVIRONMENT.md).
 
-| Variable                        | Scope                  | Purpose                                                |
-| ------------------------------- | ---------------------- | ------------------------------------------------------ |
-| `VITE_SUPABASE_URL`             | Browser                | Supabase backend URL exposed to the client             |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Browser                | Publishable/anonymous key exposed to the client        |
-| `VITE_SUPABASE_PROJECT_ID`      | Browser                | Supabase project identifier                            |
-| `SUPABASE_URL`                  | Server and SSR         | Backend URL for server-side rendering and handlers     |
-| `SUPABASE_PUBLISHABLE_KEY`      | Server and SSR         | Publishable key for server-side reads                  |
-| `SUPABASE_PROJECT_ID`           | Server and SSR         | Backend project identifier                             |
-| `VITE_APP_URL`                  | Optional browser value | Absolute production URL used for social image metadata |
-| `PORT`                          | Optional runtime value | Development server port override                       |
-| `NODE_OPTIONS`                  | Optional build value   | Memory override for constrained devices                |
-| `ODDS_API_KEY`                  | Server / Edge Function | API key for The Odds API, used by the sports-tips edge function |
-| `ODDS_API_SPORT_KEYS`           | Server / Edge Function | Optional comma-separated list of Odds API sport keys to fetch   |
-| `CRON_SECRET`                   | Server / Edge Function | Shared secret that authorizes the scheduled sports-tips refresh |
+| විචල්‍යය                        | විෂය පථය               | අරමුණ |
+|---------------------------------|------------------------|-------|
+| `VITE_SUPABASE_URL`             | බ්‍රවුසරය              | සේවාලාභියාට නිරාවරණය වන Supabase බැක්එන්ඩ් URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | බ්‍රවුසරය              | සේවාලාභියාට නිරාවරණය වන ප්‍රකාශනීය / නිර්නාමික යතුර |
+| `VITE_SUPABASE_PROJECT_ID`      | බ්‍රවුසරය              | Supabase ව්‍යාපෘති හඳුනාගැනීම |
+| `SUPABASE_URL`                  | සේවාදායකය සහ SSR       | සේවාදායක-පාර්ශ්ව රෙන්ඩරිං සහ හසුරුවන්නන් සඳහා බැක්එන්ඩ් URL |
+| `SUPABASE_PUBLISHABLE_KEY`      | සේවාදායකය සහ SSR       | සේවාදායක-පාර්ශ්ව කියවීම් සඳහා ප්‍රකාශනීය යතුර |
+| `SUPABASE_PROJECT_ID`           | සේවාදායකය සහ SSR       | බැක්එන්ඩ් ව්‍යාපෘති හඳුනාගැනීම |
+| `VITE_APP_URL`                  | විකල්ප බ්‍රවුසර අගය   | සමාජ රූප පාරදත්ත සඳහා භාවිතා කරන නිරපේක්ෂ නිෂ්පාදන URL |
+| `PORT`                          | විකල්ප ධාවන කාල අගය   | සංවර්ධන සේවාදායක පෝර්ට් අභිබවා යාම |
+| `NODE_OPTIONS`                  | විකල්ප ගොඩනැගීම් අගය | සීමිත උපාංග සඳහා මතක අභිබවා යාම |
+| `ODDS_API_KEY`                  | සේවාදායකය / Edge ශ්‍රිතය | The Odds API සඳහා API යතුර (ක්‍රීඩා-ඉඟි edge ශ්‍රිතය) |
+| `ODDS_API_SPORT_KEYS`           | සේවාදායකය / Edge ශ්‍රිතය | විකල්ප කොමාවෙන් වෙන් කළ Odds API ක්‍රීඩා යතුරු ලැයිස්තුව |
+| `CRON_SECRET`                   | සේවාදායකය / Edge ශ්‍රිතය | නියමිත ක්‍රීඩා-ඉඟි යාවත්කාලීනය අනුමත කරන හවුල් රහස |
 
-Never place service-role keys, database passwords, or other secrets in a `VITE_*` variable. Anything prefixed with `VITE_` is bundled into browser code. After changing `.env`, restart the development server and rebuild before testing the change.
+**වැදගත් ආරක්ෂක නීති**
 
-WhatsApp number, transaction limits, and the promo code are application settings stored in the backend and managed from the admin portal. They are not environment variables. The documented defaults are WhatsApp `+94765865387`, minimum transaction `1,000`, maximum transaction `500,000`, and promo code `VGSL` when the settings row is absent.
+- සේවා-භූමිකා යතුරු, දත්ත සමුදා මුරපද හෝ වෙනත් රහස් කිසි විටෙකත් `VITE_*` විචල්‍යයක තබන්න එපා. `VITE_` උපසර්ගය සහිත ඕනෑම දෙයක් බ්‍රවුසර කේතයට ඇතුළත් කෙරේ.
+- `.env` වෙනස් කිරීමෙන් පසු, වෙනස පරීක්ෂා කිරීමට පෙර සංවර්ධන සේවාදායකය නැවත ආරම්භ කර නැවත ගොඩනගන්න.
 
-## Available scripts
+WhatsApp අංකය, ගනුදෙනු සීමාවන් සහ ප්‍රෝමෝ කේතය යනු බැක්එන්ඩ්හි ගබඩා කර පරිපාලක ද්වාරයෙන් කළමනාකරණය කරන **යෙදුම් සැකසුම්** වේ. ඒවා පරිසර විචල්‍ය **නොවේ**. ලේඛනගත පෙරනිමි (සැකසුම් පේළිය නොමැති විට):
 
-| Command              | Purpose                                                                    |
-| -------------------- | ---------------------------------------------------------------------------- |
-| `npm run dev`        | Start the Vite development server, normally on port `8080`.                |
-| `npm run build`      | Create the production client and Nitro server output.                      |
-| `npm run build:dev`  | Create a development-mode Vite build.                                      |
-| `npm run build:node` | Create a Nitro build using the `node-server` preset.                       |
-| `npm start`          | Run the built output with `node .output/server/index.mjs`.                 |
-| `npm run preview`    | Run `build:node` and then `start`, for a local production-style preview.   |
-| `npm run deploy`     | Build the project and deploy the generated output with `wrangler deploy`.  |
-| `npm run lint`       | Run the repository ESLint configuration.                                   |
-| `npm run format`     | Format project files with Prettier.                                        |
+- WhatsApp: `+94765865387`
+- අවම ගනුදෙනුව: `1,000`
+- උපරිම ගනුදෙනුව: `500,000`
+- ප්‍රෝමෝ කේතය: `VGSL`
 
-## User and admin workflows
+## ලබා ගත හැකි ස්ක්‍රිප්ට්
 
-A user may browse the public pages without signing in. Deposit and withdrawal requests are submitted through their respective forms, and authenticated users can later view their own transaction history. An uploaded receipt remains associated with the request according to the configured backend implementation. Users should never submit their 1xBet password, one-time password, or unrelated security credentials to this portal.
+| විධානය              | අරමුණ |
+|---------------------|-------|
+| `npm run dev`       | Vite සංවර්ධන සේවාදායකය ආරම්භ කරන්න (සාමාන්‍යයෙන් පෝර්ට් `8080`) |
+| `npm run build`     | නිෂ්පාදන සේවාලාභියා සහ Nitro සේවාදායක ප්‍රතිදානය සාදන්න |
+| `npm run build:dev` | සංවර්ධන-ප්‍රකාර Vite ගොඩනැගීමක් සාදන්න |
+| `npm run build:node`| `node-server` පෙරසැකසුම භාවිතා කර Nitro ගොඩනැගීමක් සාදන්න |
+| `npm start`         | ගොඩනගන ලද ප්‍රතිදානය `node .output/server/index.mjs` සමඟ ධාවනය කරන්න |
+| `npm run preview`   | `build:node` පසුව `start` ධාවනය කරන්න (දේශීය නිෂ්පාදන-විලාස පෙරදසුන) |
+| `npm run deploy`    | ව්‍යාපෘතිය ගොඩනගා උත්පාදිත ප්‍රතිදානය `wrangler deploy` සමඟ උපයෝගී කරන්න |
+| `npm run lint`      | ගබඩා ESLint වින්‍යාසය ධාවනය කරන්න |
+| `npm run format`    | Prettier සමඟ ව්‍යාපෘති ගොනු හැඩගස්වන්න |
 
-Administrators sign in at `/admin`. The backend derives the administrator role from the protected `user_roles` data and checks authorization on admin reads and writes. The dashboard contains four tabs: **Bank & Payment Accounts**, **Transactions**, **System Settings**, and **Stats Overview**. These tabs use an equal-width responsive grid on desktop, a two-column grid on medium screens, and a single-column stack on narrow mobile screens.
+## පරිශීලක සහ පරිපාලක ක්‍රියා ප්‍රවාහ
 
-To grant administrator access, create the user normally and add the appropriate `admin` role through the controlled backend process described in [`docs/ADMIN_MANUAL.md`](docs/ADMIN_MANUAL.md). Do not add a client-side role flag or hardcode an administrator email in the frontend.
+**පරිශීලකයන්** පිවිසීමකින් තොරව පොදු පිටු බ්‍රවුස් කළ හැක. තැන්පතු සහ මුදල් ආපසු ගැනීමේ ඉල්ලීම් අදාළ පෝරම හරහා ඉදිරිපත් කෙරේ. සත්‍යාපිත පරිශීලකයන්ට පසුව තමන්ගේම ගනුදෙනු ඉතිහාසය බැලිය හැක. උඩුගත කළ ලදුපතක් වින්‍යාසිත බැක්එන්ඩ් ක්‍රියාත්මක කිරීම අනුව ඉල්ලීම සමඟ සම්බන්ධ වේ. පරිශීලකයන් මෙම ද්වාරයට තම 1xBet මුරපදය, එක්-වර මුරපදය හෝ අදාළ නොවන ආරක්ෂක අක්තපත්‍ර **කිසිසේත්ම** ඉදිරිපත් නොකළ යුතුය.
 
-## PWA installation
+**පරිපාලකයන්** `/admin` හි පිවිසේ. බැක්එන්ඩ් ආරක්ෂිත `user_roles` දත්ත වෙතින් පරිපාලක භූමිකාව ව්‍යුත්පන්න කර සියලු පරිපාලක කියවීම් සහ ලිවීම් මත අනුමැතිය බලාත්මක කරයි. උපකරණ පුවරුවේ ටැබ් හතරක් අඩංගු වේ:
 
-The project includes the three requirements needed for browser installation: a web manifest, install icons, and a registered service worker. The root layout registers `/sw.js`, and the manifest is linked from the document head.
+- බැංකු සහ ගෙවීම් ගිණුම්  
+- ගනුදෙනු  
+- පද්ධති සැකසුම්  
+- සංඛ්‍යාලේඛන දළ විශ්ලේෂණය  
 
-On browsers that support `beforeinstallprompt`, the **Install App** button opens the native installation prompt. On iOS and browsers that do not expose that event, the button displays the correct browser-menu or **Add to Home Screen** guidance instead of silently doing nothing. Installation generally requires a secure HTTPS deployment or a local development origin supported by the browser.
+මෙම ටැබ් ඩෙස්ක්ටොප්හි සමාන පළල ප්‍රතිචාරාත්මක ජාලකයක්, මධ්‍යම තිරවල තීරු දෙකක ජාලකයක් සහ පටු ජංගම තිරවල තනි-තීරු ස්ථරයක් භාවිතා කරයි.
 
-When testing a new deployment, clear any previous site data or wait for the service-worker update if an older cached bundle is still displayed. The service-worker cache version is intentionally bumped when the application shell changes.
+පරිපාලක ප්‍රවේශය ලබා දීමට, පරිශීලකයා සාමාන්‍ය පරිදි සාදා [`docs/ADMIN_MANUAL.md`](docs/ADMIN_MANUAL.md) හි විස්තර කර ඇති පාලනය කළ බැක්එන්ඩ් ක්‍රියාවලිය හරහා අදාළ `admin` භූමිකාව එකතු කරන්න. සේවාලාභී-පාර්ශ්ව භූමිකා ධජයක් එකතු නොකරන්න හෝ ඉදිරිපසෙහි පරිපාලක විද්‍යුත් තැපෑලක් දැඩි කේතගත නොකරන්න.
 
-## Testing and verification
+## PWA ස්ථාපනය
 
-After editing the application, run the production build:
+ව්‍යාපෘතිය බ්‍රවුසර ස්ථාපනය සඳහා අවශ්‍ය අවශ්‍යතා තුන සපුරාලයි:
+
+- වෙබ් මැනිෆෙස්ට්
+- ස්ථාපන අයිකන
+- ලියාපදිංචි සේවා කාර්මිකයා
+
+මූල පිරිසැලසුම `/sw.js` ලියාපදිංචි කරන අතර මැනිෆෙස්ට් ලේඛන හිසෙන් සම්බන්ධ කෙරේ.
+
+- `beforeinstallprompt` සහාය දක්වන බ්‍රවුසරවල, **යෙදුම ස්ථාපනය කරන්න** බොත්තම ස්වදේශීය ස්ථාපන ඉඟිය විවෘත කරයි.
+- iOS සහ එම සිදුවීම නිරාවරණය නොකරන බ්‍රවුසරවල, බොත්තම නිවැරදි බ්‍රවුසර-මෙනු හෝ **මුල් තිරයට එකතු කරන්න** මාර්ගෝපදේශය පෙන්වයි.
+
+ස්ථාපනය සාමාන්‍යයෙන් ආරක්ෂිත HTTPS උපයෝගීතාවක් (හෝ බ්‍රවුසරය සහාය දක්වන දේශීය සංවර්ධන මූලාරම්භයක්) අවශ්‍ය කරයි. නව උපයෝගීතාවක් පරීක්ෂා කරන විට, පෙර අඩවි දත්ත හිස් කරන්න හෝ පැරණි කෑෂ් කළ බඳුන තවමත් පෙන්වන්නේ නම් සේවා-කාර්මික යාවත්කාලීනය සඳහා රැඳී සිටින්න. යෙදුම් ෂෙල් වෙනස් වූ විට සේවා-කාර්මික කෑෂ් අනුවාදය හිතාමතාම වැඩි කෙරේ.
+
+## පරීක්ෂණ සහ සත්‍යාපනය
+
+යෙදුම සංස්කරණය කිරීමෙන් පසු, නිෂ්පාදන ගොඩනැගීම ධාවනය කරන්න:
 
 ```bash
 npm run build
 ```
 
-Then verify the main routes, authentication, request submission, admin authorization, responsive layouts, and PWA assets. The project checklists provide the detailed acceptance criteria:
+ඉන්පසු ප්‍රධාන මාර්ග, සත්‍යාපනය, ඉල්ලීම් ඉදිරිපත් කිරීම, පරිපාලක අනුමැතිය, ප්‍රතිචාරාත්මක පිරිසැලසුම් සහ PWA වත්කම් සත්‍යාපනය කරන්න. විස්තරාත්මක පිළිගැනීමේ නිර්ණායක මෙහි සපයා ඇත:
 
-- [`docs/TESTING_CHECKLIST.md`](docs/TESTING_CHECKLIST.md) contains smoke, authentication, deposit, withdrawal, admin, security, and responsive checks.
-- [`docs/PRODUCTION_CHECKLIST.md`](docs/PRODUCTION_CHECKLIST.md) covers production content, deployment, performance, and end-to-end verification.
-- [`docs/SECURITY_CHECKLIST.md`](docs/SECURITY_CHECKLIST.md) covers role authorization, Row Level Security, secrets, and operational controls.
+- [`docs/TESTING_CHECKLIST.md`](docs/TESTING_CHECKLIST.md) – දුම්, සත්‍යාපනය, තැන්පතු, මුදල් ආපසු ගැනීම, පරිපාලක, ආරක්ෂාව සහ ප්‍රතිචාරාත්මක පරීක්ෂණ
+- [`docs/PRODUCTION_CHECKLIST.md`](docs/PRODUCTION_CHECKLIST.md) – නිෂ්පාදන අන්තර්ගතය, උපයෝගීතාව, කාර්ය සාධනය සහ අවසානය-සිට-අවසානය සත්‍යාපනය
+- [`docs/SECURITY_CHECKLIST.md`](docs/SECURITY_CHECKLIST.md) – භූමිකා අනුමැතිය, Row Level Security, රහස් සහ මෙහෙයුම් පාලන
 
-The build must complete with `✓ built`. Run `npm run lint` as part of review and resolve any reported findings before release. For OCR testing, use a clear receipt image and confirm that the browser is allowed to load the Tesseract language data.
+ගොඩනැගීම `✓ built` සමඟ සම්පූර්ණ විය යුතුය. සමාලෝචනයේ කොටසක් ලෙස `npm run lint` ධාවනය කර නිකුතුවට පෙර වාර්තා කළ සොයාගැනීම් විසඳන්න. OCR පරීක්ෂණය සඳහා පැහැදිලි ලදුපත් රූපයක් භාවිතා කර බ්‍රවුසරයට Tesseract භාෂා දත්ත පූරණය කිරීමට අවසර ඇති බව තහවුරු කරන්න.
 
-## Deployment
+## උපයෝගීතාව
 
-For Lovable Cloud deployments, keep the project connected to its configured backend and use the platform's deployment workflow. For a Cloudflare-compatible deployment, build the project and deploy the generated Nitro/Wrangler output according to [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). Set `VITE_APP_URL` to the final HTTPS domain so Open Graph and Twitter image metadata use the correct origin.
+- **Lovable Cloud** – ව්‍යාපෘතිය එහි වින්‍යාසිත බැක්එන්ඩ් වෙත සම්බන්ධව තබා වේදිකාවේ උපයෝගීතා ක්‍රියා ප්‍රවාහය භාවිතා කරන්න.
+- **Cloudflare-ගැළපෙන** – ව්‍යාපෘතිය ගොඩනගා [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) අනුව උත්පාදිත Nitro / Wrangler ප්‍රතිදානය උපයෝගී කරන්න. Open Graph සහ Twitter රූප පාරදත්ත නිවැරදි මූලාරම්භය භාවිතා කරන පරිදි `VITE_APP_URL` අවසාන HTTPS වසම වෙත සකසන්න.
 
-Before a production release, confirm that the backend migrations are applied, Row Level Security policies are active, administrator access is verified, agent payment accounts are correct digit by digit, and the WhatsApp contact reaches a monitored device. Never use production credentials in screenshots, source control, public issue reports, or test fixtures.
+නිෂ්පාදන නිකුතුවකට පෙර තහවුරු කරන්න:
 
-## Termux and proot-distro
+- බැක්එන්ඩ් සංක්‍රමණ යොදා ඇත
+- Row Level Security ප්‍රතිපත්ති සක්‍රීයයි
+- පරිපාලක ප්‍රවේශය සත්‍යාපනය කර ඇත
+- නියෝජිත ගෙවීම් ගිණුම් ඉලක්කම් අනුව නිවැරදියි
+- WhatsApp සම්බන්ධතාව නිරීක්ෂණය කරන උපාංගයකට ළඟා වේ
 
-Inside a Termux Ubuntu or `proot-distro` Ubuntu environment, the project can be run with the same npm commands after Node.js and unzip are available:
+නිෂ්පාදන අක්තපත්‍ර කිසි විටෙකත් තිර රූප, මූලාශ්‍ර පාලනය, පොදු ගැටළු වාර්තා හෝ පරීක්ෂණ උපාංගවල භාවිතා නොකරන්න.
+
+## Termux සහ proot-distro
+
+Termux Ubuntu හෝ `proot-distro` Ubuntu පරිසරයක් තුළ, Node.js සහ unzip ලබා ගත හැකි වූ පසු ව්‍යාපෘතිය එකම npm විධාන සමඟ ධාවනය කළ හැක:
 
 ```bash
 pkg update && pkg upgrade -y
@@ -247,59 +276,64 @@ pkg install nodejs-lts git unzip -y
 termux-setup-storage
 
 cd /root
-unzip /root/storage/Download/FastCash-admin-tabs-fixed.zip -d inclusive
+unzip /root/storage/Download/your-project.zip -d inclusive
 cd /root/inclusive
 npm install --legacy-peer-deps
 npm run dev
 ```
 
-If the project already exists and only selected files are being updated, copy only the files supplied with the update ZIP and keep a backup of the existing files. Do not delete the existing project directory, `.env`, Supabase migrations, or unrelated source files. The development site can then be opened at [http://localhost:8080](http://localhost:8080) from the phone browser.
-
-On low-memory devices, use the following build command:
+අඩු-මතක උපාංගවල භාවිතා කරන්න:
 
 ```bash
 NODE_OPTIONS=--max-old-space-size=2048 npm run build
 ```
 
-## Troubleshooting
+තෝරාගත් ගොනු පමණක් යාවත්කාලීන කරන්නේ නම්, එම ගොනු පමණක් පිටපත් කර පවතින ව්‍යාපෘතියේ උපස්ථයක් තබා ගන්න. පවතින ව්‍යාපෘති නාමාවලිය, `.env`, Supabase සංක්‍රමණ හෝ අදාළ නොවන මූලාශ්‍ර ගොනු **මකන්න එපා**.
 
-| Symptom                                                      | Recommended action                                                                                                                        |
-| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `Missing Supabase environment variable(s)`                   | Confirm the required keys in `.env`, check spelling, and restart the dev server.                                                          |
-| `Failed to fetch` during login or request submission         | Check internet access, backend availability, firewall/VPN settings, and Supabase configuration.                                           |
-| Port already in use                                          | Run `PORT=3000 npm run dev` and open the new port.                                                                                        |
-| Build runs out of memory                                     | Set `NODE_OPTIONS=--max-old-space-size=2048` before `npm run build`.                                                                      |
-| OCR does not finish                                          | Use a smaller, clearer image, keep the browser tab active, and confirm that OCR language data can load.                                   |
-| Install button shows instructions instead of a native prompt | This is expected when the browser does not expose `beforeinstallprompt`; use the displayed browser-menu instructions.                     |
-| Old layout remains after deployment                          | Refresh after the service-worker update, clear site data during testing, or unregister the old service worker in browser developer tools. |
-| Blank page after local edits                                 | Stop the server, remove `node_modules/.vite`, reinstall dependencies if necessary, and restart.                                           |
+## දෝෂ නිරාකරණය
 
-## Security and operational notes
+| රෝග ලක්ෂණය | නිර්දේශිත ක්‍රියාව |
+|-----------|-------------------|
+| `Missing Supabase environment variable(s)` | `.env` හි අවශ්‍ය යතුරු තහවුරු කරන්න, අක්ෂර වින්‍යාසය පරීක්ෂා කරන්න, සහ සංවර්ධන සේවාදායකය නැවත ආරම්භ කරන්න. |
+| පිවිසුම හෝ ඉල්ලීම් ඉදිරිපත් කිරීමේදී `Failed to fetch` | අන්තර්ජාල ප්‍රවේශය, බැක්එන්ඩ් ලබා ගත හැකි බව, ගිනි බිත්ති/VPN සැකසුම් සහ Supabase වින්‍යාසය පරීක්ෂා කරන්න. |
+| පෝර්ට් දැනටමත් භාවිතයේ ඇත | `PORT=3000 npm run dev` ධාවනය කර නව පෝර්ට් විවෘත කරන්න. |
+| ගොඩනැගීම මතකයෙන් ඉවත් වේ | `npm run build` ට පෙර `NODE_OPTIONS=--max-old-space-size=2048` සකසන්න. |
+| OCR අවසන් නොවේ | කුඩා, පැහැදිලි රූපයක් භාවිතා කරන්න, බ්‍රවුසර ටැබ් සක්‍රීයව තබා ගන්න, සහ OCR භාෂා දත්ත පූරණය කළ හැකි බව තහවුරු කරන්න. |
+| ස්ථාපන බොත්තම ස්වදේශීය ඉඟියක් වෙනුවට උපදෙස් පෙන්වයි | බ්‍රවුසරය `beforeinstallprompt` නිරාවරණය නොකරන විට අපේක්ෂිත හැසිරීම; පෙන්වන බ්‍රවුසර-මෙනු උපදෙස් අනුගමනය කරන්න. |
+| උපයෝගීතාවෙන් පසු පැරණි පිරිසැලසුම ඉතිරිව ඇත | සේවා-කාර්මික යාවත්කාලීනයෙන් පසු නැවුම් කරන්න, පරීක්ෂණ අතරතුර අඩවි දත්ත හිස් කරන්න, හෝ බ්‍රවුසර සංවර්ධක මෙවලම්වල පැරණි සේවා කාර්මිකයා ලියාපදිංචියෙන් ඉවත් කරන්න. |
+| දේශීය සංස්කරණවලින් පසු හිස් පිටුව | සේවාදායකය නවත්වන්න, `node_modules/.vite` ඉවත් කරන්න, අවශ්‍ය නම් යැපීම් නැවත ස්ථාපනය කරන්න, සහ නැවත ආරම්භ කරන්න. |
 
-Admin authorization is a server-side concern. The frontend must not decide whether a user is an administrator based on local storage, a hardcoded email, or a client-only flag. Keep Row Level Security enabled for profiles, roles, transactions, bank accounts, and application settings. Review the role table and payment account details regularly.
+## ආරක්ෂාව සහ මෙහෙයුම් සටහන්
 
-Treat receipts, bank details, contact numbers, security codes, and transaction records as sensitive information. Use HTTPS in production, avoid logging personal or financial data, and retain only the data required for the service and its audit process. Follow the backup, recovery, and incident procedures in [`docs/BACKUP.md`](docs/BACKUP.md).
+- පරිපාලක අනුමැතිය යනු **සේවාදායක-පාර්ශ්ව** කාරණයකි. ඉදිරිපස කිසි විටෙකත් දේශීය ගබඩාව, දැඩි කේතගත විද්‍යුත් තැපෑලක් හෝ සේවාලාභී-පමණක් ධජයක් මත පදනම්ව පරිශීලකයෙකු පරිපාලකයෙකු දැයි තීරණය නොකළ යුතුය.
+- පැතිකඩ, භූමිකා, ගනුදෙනු, බැංකු ගිණුම් සහ යෙදුම් සැකසුම් සඳහා Row Level Security සක්‍රීයව තබා ගන්න.
+- භූමිකා වගුව සහ ගෙවීම් ගිණුම් විස්තර නිතිපතා සමාලෝචනය කරන්න.
+- ලදුපත්, බැංකු විස්තර, සම්බන්ධතා අංක, ආරක්ෂක කේත සහ ගනුදෙනු වාර්තා සංවේදී තොරතුරු ලෙස සලකන්න.
+- නිෂ්පාදනයේ HTTPS භාවිතා කරන්න, පුද්ගලික හෝ මූල්‍ය දත්ත ලොග් කිරීමෙන් වළකින්න, සහ සේවාව සහ එහි විගණන ක්‍රියාවලිය සඳහා අවශ්‍ය දත්ත පමණක් රඳවා ගන්න.
+- [`docs/BACKUP.md`](docs/BACKUP.md) හි උපස්ථ, ප්‍රතිසාධන සහ සිදුවීම් ක්‍රියා පටිපාටි අනුගමනය කරන්න.
 
-## Documentation
+## ලේඛන
 
-| Guide                                                          | Coverage                                                           |
-| -------------------------------------------------------------- | ------------------------------------------------------------------ |
-| [`docs/INSTALLATION.md`](docs/INSTALLATION.md)                 | Detailed setup, Termux commands, verification, and troubleshooting |
-| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)                     | Deployment and rollback guidance                                   |
-| [`docs/ENVIRONMENT.md`](docs/ENVIRONMENT.md)                   | Environment variables and configuration rules                      |
-| [`docs/API.md`](docs/API.md)                                   | API endpoints, request payloads, responses, and data model         |
-| [`docs/ADMIN_MANUAL.md`](docs/ADMIN_MANUAL.md)                 | Administrator sign-in, dashboard operation, and role management    |
-| [`docs/USER_MANUAL.md`](docs/USER_MANUAL.md)                   | User-facing deposit, withdrawal, account, and support workflows    |
-| [`docs/BACKUP.md`](docs/BACKUP.md)                             | Backup, restore, and recovery procedures                           |
-| [`docs/SECURITY_CHECKLIST.md`](docs/SECURITY_CHECKLIST.md)     | Security acceptance checks                                         |
-| [`docs/TESTING_CHECKLIST.md`](docs/TESTING_CHECKLIST.md)       | Functional and regression test checklist                           |
-| [`docs/PRODUCTION_CHECKLIST.md`](docs/PRODUCTION_CHECKLIST.md) | Production readiness checklist                                     |
-| [`docs/SPORTS_TIPS_SETUP.md`](docs/SPORTS_TIPS_SETUP.md)       | Setup for the free cricket/football tips feature (Odds API, edge function, migration) |
-| [`docs/AGENTS.md`](docs/AGENTS.md)                              | Notes and constraints for AI coding agents working on this repo    |
-| [`docs/APP_TEST_REPORT.md`](docs/APP_TEST_REPORT.md)            | Dated application test report                                      |
-| [`docs/FREE-TIPS-ASSESSMENT-SI.md`](docs/FREE-TIPS-ASSESSMENT-SI.md) | Sinhala-language assessment of the free tips system            |
-| [`docs/LAYOUT_VERIFICATION.md`](docs/LAYOUT_VERIFICATION.md)    | Notes from browser layout verification passes                      |
-| [`docs/VERIFICATION_NOTES.md`](docs/VERIFICATION_NOTES.md)      | General fix/build verification notes                                |
+| මාර්ගෝපදේශය | ආවරණය |
+|-------------|-------|
+| [`docs/INSTALLATION.md`](docs/INSTALLATION.md) | විස්තරාත්මක සැකසුම, Termux විධාන, සත්‍යාපනය සහ දෝෂ නිරාකරණය |
+| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | උපයෝගීතාව සහ ආපසු හැරවීමේ මාර්ගෝපදේශය |
+| [`docs/ENVIRONMENT.md`](docs/ENVIRONMENT.md) | පරිසර විචල්‍ය සහ වින්‍යාස නීති |
+| [`docs/API.md`](docs/API.md) | API අන්ත ලක්ෂ්‍ය, ඉල්ලීම් පේලෝඩ්, ප්‍රතිචාර සහ දත්ත ආකෘතිය |
+| [`docs/ADMIN_MANUAL.md`](docs/ADMIN_MANUAL.md) | පරිපාලක පිවිසුම, උපකරණ පුවරු මෙහෙයුම සහ භූමිකා කළමනාකරණය |
+| [`docs/USER_MANUAL.md`](docs/USER_MANUAL.md) | පරිශීලක-මුහුණත තැන්පතු, මුදල් ආපසු ගැනීම, ගිණුම සහ සහාය ක්‍රියා ප්‍රවාහ |
+| [`docs/BACKUP.md`](docs/BACKUP.md) | උපස්ථ, ප්‍රතිස්ථාපන සහ ප්‍රතිසාධන ක්‍රියා පටිපාටි |
+| [`docs/SECURITY_CHECKLIST.md`](docs/SECURITY_CHECKLIST.md) | ආරක්ෂක පිළිගැනීමේ පරීක්ෂණ |
+| [`docs/TESTING_CHECKLIST.md`](docs/TESTING_CHECKLIST.md) | ක්‍රියාකාරී සහ ප්‍රතිගාමී පරීක්ෂණ ලැයිස්තුව |
+| [`docs/PRODUCTION_CHECKLIST.md`](docs/PRODUCTION_CHECKLIST.md) | නිෂ්පාදන සූදානම්භාවය ලැයිස්තුව |
+| [`docs/SPORTS_TIPS_SETUP.md`](docs/SPORTS_TIPS_SETUP.md) | නොමිලේ ක්‍රිකට්/පාපන්දු ඉඟි විශේෂාංගය සඳහා සැකසුම (Odds API, edge ශ්‍රිතය, සංක්‍රමණය) |
+| [`docs/AGENTS.md`](docs/AGENTS.md) | මෙම ගබඩාවේ වැඩ කරන AI කේතන නියෝජිතයන් සඳහා සටහන් සහ සීමාවන් |
+| [`docs/APP_TEST_REPORT.md`](docs/APP_TEST_REPORT.md) | දිනය සහිත යෙදුම් පරීක්ෂණ වාර්තාව |
+| [`docs/FREE-TIPS-ASSESSMENT-SI.md`](docs/FREE-TIPS-ASSESSMENT-SI.md) | නොමිලේ ඉඟි පද්ධතියේ සිංහල-භාෂා තක්සේරුව |
+| [`docs/LAYOUT_VERIFICATION.md`](docs/LAYOUT_VERIFICATION.md) | බ්‍රවුසර පිරිසැලසුම් සත්‍යාපන පාස් වලින් සටහන් |
+| [`docs/VERIFICATION_NOTES.md`](docs/VERIFICATION_NOTES.md) | සාමාන්‍ය නිවැරදි කිරීම / ගොඩනැගීම් සත්‍යාපන සටහන් |
 
-Maintained for the Fast Cash project.
+---
 
+Fast Cash ව්‍යාපෘතිය සඳහා නඩත්තු කෙරේ.
+```
